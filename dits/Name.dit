@@ -19,7 +19,7 @@ FullName {
         for mid in (@@middleNames):
             full += ' ' + mid['value']
         full += ' ' + @@familyName.value
-        return 'Hi! My name is ' + full
+        return full
     }}
 }
 
