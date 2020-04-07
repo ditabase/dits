@@ -16,8 +16,9 @@ FullName {
     Name familyName;
     print Python {{
         full = @@givenName.value
-        for mid in (@@middleNames):
-            if mid: # In case there are no middle names
+        middle = @@middleNames
+        if middle:
+            for mid in (@@middleNames):
                 full += ' ' + mid['value']
         full += ' ' + @@familyName.value
         return full
