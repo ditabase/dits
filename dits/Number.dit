@@ -2,7 +2,7 @@ Number {
     String value;
     print value;
     validator Javascript {{
-        const num = @@print(value);
+        const num = @@value;
         if (isNaN(parseFloat(num)) || !isFinite(num)) {
             return `"${num}" is not a number.`;
         }
