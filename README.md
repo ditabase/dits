@@ -3,7 +3,7 @@ A collection of useful [dit classes](https://github.com/isaiahshiner/dit-cli) to
 
 Link these in dits like this:
 
-    import SomeNamespace 'https://raw.githubusercontent.com/isaiahshiner/dits/master/dits/Number.dit';
+    import SomeNamespace from 'https://raw.githubusercontent.com/isaiahshiner/dits/master/dits/Number.dit';
 
 Feel free to make pull requests with your own useful dits classes, for any situation or purpose. The shareability of dit resources is one of the key features of dit.
 
