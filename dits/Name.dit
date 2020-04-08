@@ -18,7 +18,7 @@ FullName {
         full = @@givenName.value
         middle = @@middleNames
         if middle:
-            for mid in (@@middleNames):
+            for mid in (middle):
                 full += ' ' + mid['value']
         full += ' ' + @@familyName.value
         return full
