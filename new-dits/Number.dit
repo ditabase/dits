@@ -1,0 +1,28 @@
+Number {{
+    Ditlang void __init__(Number self, String num) {{
+        self.value = num;
+    }}
+
+    Javascript void __validate__(Number self) {{
+        const num = <|value|>;
+        if (isNaN(parseFloat(num)) || !isFinite(num)) {
+            <|throw (|`"${num}" is not a number.`;|)|>
+        }
+    }}
+
+    Ditlang void inc(Number self) {{
+        self.add('1');
+    }}
+
+    Ditlang void dec(Number self) {{
+        self.sub('1');
+    }}
+
+    Javascript void add(Number self, String operand) {{
+        <|self.value = (|parseFloat(<|self.value|>) + parseFloat(<|operand|>);|)|>
+    }}
+
+    Javascript void sub(Number self, String operand) {{
+        <|self.value = (|parseFloat(<|self.value|>) - parseFloat(<|operand|>);|)|>
+    }}
+}}
