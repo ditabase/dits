@@ -10,19 +10,19 @@ Number {{
         }
     }}
 
-    Ditlang void inc(Number self) {{
-        self.add('1');
-    }}
-
-    Ditlang void dec(Number self) {{
-        self.sub('1');
-    }}
-
     Javascript void add(Number self, String operand) {{
         <|self.value = (|parseFloat(<|self.value|>) + parseFloat(<|operand|>);|)|>
     }}
 
+    Ditlang void inc(Number self) {{
+        self.add('1');
+    }}
+
     Javascript void sub(Number self, String operand) {{
         <|self.value = (|parseFloat(<|self.value|>) - parseFloat(<|operand|>);|)|>
+    }}
+
+    Ditlang void dec(Number self) {{
+        self.sub('1');
     }}
 }}
