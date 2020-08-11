@@ -3,7 +3,11 @@ Number {{
         self.value = num;
     }}
 
-    Javascript void __validate__(Number self) {{
+    Ditlang void __run__(Fruit self) {{
+        self.validate();
+    }}
+
+    Javascript void validate(Number self) {{
         const num = <|value|>;
         if (isNaN(parseFloat(num)) || !isFinite(num)) {
             <|throw (|`"${num}" is not a number.`;|)|>
