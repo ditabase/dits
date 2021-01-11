@@ -1,0 +1,42 @@
+lang JavaScript {{
+    -priority- = '1';
+    executable_path = '/usr/bin/node'
+    file_extension = 'js'
+
+    null_type = 'null'
+    str_open = '"'
+    str_close = '"'
+    str_escape = '\\'
+    str_newline = '\\n'
+    str_tab = '\\t'
+
+    list_open = '['
+    list_delimiter = ','
+    list_close = ']'
+
+    obj_open = '{'
+    obj_colon = ':'
+    obj_delimiter = ','
+    obj_close = '}'
+}}
+
+lang Python {{
+    executable_path = '/usr/bin/python'
+    file_extension = 'py'
+
+    null_type = 'None'
+    str_open = '"'
+    str_close = '"'
+    str_escape = '\\'
+    str_newline = '\\n'
+    str_tab = '\\t'
+
+    list_open = '['
+    list_delimiter = ','
+    list_close = ']'
+
+    obj_open = '{'
+    obj_colon = ':'
+    obj_delimiter = ','
+    obj_close = '}'
+}}
