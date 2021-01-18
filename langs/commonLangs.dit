@@ -18,6 +18,67 @@ lang JavaScript {{
     obj_colon = ':';
     obj_delimiter = ',';
     obj_close = '}';
+
+    exe_ditlang_left = 'exe_ditlang(';
+    exe_ditlang_right = ')';
+
+    function_wrap_left = 'function reserved_name() {';
+    function_wrap_right = '}';
+    export_string = 'module.exports = { reserved_name };';
+
+    guest_daemon = func () {{
+        const net = require("net");
+        const server = new net.Socket();
+        const fs = require("fs");
+        const port = process.argv[2];
+        server.connect(port, "127.0.0.1", () => {
+            //console.log("JS daemon starting on port " + port);
+            server.write(JSON.stringify({ type: "connect", lang: "JavaScript" }));
+        });
+
+        const FUNC_REG = {};
+
+        server.on("data", (data) => {
+            //console.log("JS daemon received data");
+            try {
+                let jsonData = JSON.parse(data);
+                if (jsonData["type"] == "call_func") {
+                    let func = FUNC_REG[jsonData["func_name"]];
+                    if (func == null) {
+                        //console.log(`JS daemon adding '${jsonData["func_name"]}'`);
+                        var script = require(jsonData["func_path"]);
+                        FUNC_REG[jsonData["func_name"]] = script.reserved_name;
+                        func = script.reserved_name;
+                    }
+                    //console.log(`JS daemon executing '${jsonData["func_name"]}'`);
+                    res = func();
+                    let finishMessage = JSON.stringify({
+                        type: "finish_func",
+                        result: res,
+                    });
+                    server.write(finishMessage);
+                }
+            } catch (err) {
+                //console.log("JS daemon is crashing");
+                crashMessage = JSON.stringify({
+                    type: "crash",
+                    result: err.stack,
+                });
+                server.write(crashMessage);
+            }
+        });
+
+        function exe_ditlang(value) {
+            //console.log("JS daemon executing ditlang");
+            message = JSON.stringify({
+                type: "execute",
+                crash: false,
+                execute: value,
+            });
+            server.write(message);
+        }
+
+    }};
 }}
 
 lang Python {{
