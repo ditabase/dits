@@ -1,0 +1,40 @@
+// Gets local machine config
+getConfig();
+
+// Get languages, can also import from raw.githubusercontent.com
+pull JavaScript, Lua, Python from '/home/isaiah/general/dits/langs/commonLangs.dit';
+
+sig JavaScript String
+func add(String num1, String num2) {{
+    <|return (|parseFloat(<|num1|>) + parseFloat(<|num2|>)|)|>;
+}}
+
+sig Python listOf String
+func addNums(listOf String num_pairs) {{
+    // we are given this: ["4-5", "2-6", "2-1"]
+    // we should return this: ["9", "8", "3"]
+    num_strings = <|num_pairs;|>
+    result = []
+    for num_string in num_strings:
+        num1 = num_string[:num_string.find('-')]
+        num2 = num_string[num_string.find('-') + 1:]
+        result.append(str(<|add( (|num1|), (|num2|) );|>))
+    <|return (|result|);|>
+}}
+
+sig Lua
+func run() {{
+    json = require("rxi-json-lua")
+    nums = {}
+    math.randomseed(os.time())
+    for i = 1, 10, 1 do
+        num1 = tostring(math.floor(math.random()*10)+1)
+        num2 = tostring(math.floor(math.random()*10)+1)
+        nums[i] = num1 .. "-" .. num2
+    end
+    
+    final = json.encode(nums)
+    <|listOf String sums = addNums( (|final|) );|>
+    print(final) // we generated ["4-7","9-3","1-10","4-2"]
+    print(<|sums;|>) // python and JS added: ["11","12","11","6"]
+}}
