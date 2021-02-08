@@ -1,32 +1,34 @@
-Number {{
-    Ditlang void __init__(Number self, String num) {{
-        self.value = num;
+getConfig();
+pull JavaScript from '/home/isaiah/general/dits/langs/commonLangs.dit';
+class Number {{
+    func -make-(String num) {{
+        this.value = num;
     }}
 
-    Ditlang void __run__(Fruit self) {{
-        self.validate();
+    func -run-() {{
+        this.validate();
     }}
 
-    Javascript void validate(Number self) {{
-        const num = <|value|>;
+    sig JavaScript func validate() {{
+        const num = <|value;|>;
         if (isNaN(parseFloat(num)) || !isFinite(num)) {
             <|throw (|`"${num}" is not a number.`;|)|>
         }
     }}
 
-    Javascript void add(Number self, String operand) {{
-        <|self.value = (|parseFloat(<|self.value|>) + parseFloat(<|operand|>);|)|>
+    sig JavaScript func add(String operand) {{
+        <|this.value = (|'"' + String(parseFloat(<|this.value;|>) + parseFloat(<|operand;|>)) + '"'|);|>
     }}
 
-    Ditlang void inc(Number self) {{
-        self.add('1');
+    func inc() {{
+        this.add('1');
     }}
 
-    Javascript void sub(Number self, String operand) {{
-        <|self.value = (|parseFloat(<|self.value|>) - parseFloat(<|operand|>);|)|>
+    sig JavaScript func sub(String operand) {{
+        <|this.value = (|'"' + String(parseFloat(<|this.value;|>) - parseFloat(<|operand;|>)) + '"'|);|>
     }}
 
-    Ditlang void dec(Number self) {{
-        self.sub('1');
+    func dec() {{
+        this.sub('1');
     }}
 }}
