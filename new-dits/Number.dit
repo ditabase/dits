@@ -1,34 +1,34 @@
 getConfig();
 pull JavaScript from '/home/isaiah/general/dits/langs/commonLangs.dit';
-class Number {{
-    func -make-(String num) {{
+class Number {|
+    func -make-(Str num) {|
         this.value = num;
-    }}
+    |}
 
-    func -run-() {{
+    func -run-() {|
         this.validate();
-    }}
+    |}
 
-    sig JavaScript func validate() {{
+    sig JavaScript func validate() {|
         const num = <|value;|>;
         if (isNaN(parseFloat(num)) || !isFinite(num)) {
             <|throw (|`"${num}" is not a number.`;|)|>
         }
-    }}
+    |}
 
-    sig JavaScript func add(String operand) {{
+    sig JavaScript func add(Str operand) {|
         <|this.value = (|'"' + String(parseFloat(<|this.value;|>) + parseFloat(<|operand;|>)) + '"'|);|>
-    }}
+    |}
 
-    func inc() {{
+    func inc() {|
         this.add('1');
-    }}
+    |}
 
-    sig JavaScript func sub(String operand) {{
+    sig JavaScript func sub(Str operand) {|
         <|this.value = (|'"' + String(parseFloat(<|this.value;|>) - parseFloat(<|operand;|>)) + '"'|);|>
-    }}
+    |}
 
-    func dec() {{
+    func dec() {|
         this.sub('1');
-    }}
-}}
+    |}
+|}

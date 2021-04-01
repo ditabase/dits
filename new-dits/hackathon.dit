@@ -5,12 +5,12 @@ getConfig();
 pull JavaScript, Lua, Python from '/home/isaiah/general/dits/langs/commonLangs.dit';
 
 sig JavaScript String
-func add(String num1, String num2) {{
+func add(Str num1, Str num2) {|
     <|return (|'"' + String(parseFloat(<|num1;|>) + parseFloat(<|num2;|>)) + '"'|)|>;
-}}
+|}
 
 sig Python listOf String
-func addNums(listOf String num_pairs) {{
+func addNums(listOf Str num_pairs) {|
     # we are given this: ["4-5", "2-6", "2-1"]
     # we should return this: ["9", "8", "3"]
     num_strings = <|num_pairs;|>
@@ -20,27 +20,27 @@ func addNums(listOf String num_pairs) {{
         num2 = num_string[num_string.find('-') + 1:]
         result.append(<|add((|'"' + num1 + '"'|), (|'"' + num2 + '"'|));|>)
     <|return (|result|);|>
-}}
+|}
 
 sig Lua listOf String
-func run() {{
+func run() {|
     json = require("rxi-json-lua")
     nums = {}
     math.randomseed(os.time())
-    for i = 1, 5, 1 do
+    for i = 1, 50, 1 do
         num1 = tostring(math.floor(math.random()*10)+1)
         num2 = tostring(math.floor(math.random()*10)+1)
         nums[i] = num1 .. "-" .. num2
     end
     
     final = json.encode(nums)
-    <|listOf String sums = addNums((|final|));|>
+    <|listOf Str sums = addNums((|final|));|>
     -- we generated ["4-7","9-3","1-10","4-2"]
     print("Numbers we generated in Lua: ")
     print(final)
     <|return sums;|> -- python and JS added: ["11","12","11","6"]
-}}
-listOf String finalNums = run();
+|}
+listOf Str finalNums = run();
 print("Numbers looped and parsed in Python and added in JavaScript");
 print(finalNums);
 

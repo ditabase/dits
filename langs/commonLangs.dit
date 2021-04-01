@@ -1,4 +1,4 @@
-lang JavaScript {{
+lang JavaScript {|
     -priority- = '1';
     executable_path = '/usr/bin/node';
     file_extension = 'js';
@@ -29,7 +29,7 @@ lang JavaScript {{
     function_wrap_right = '\tyield 0;\n}';
     export_string = 'module.exports = { reserved_name };';
 
-    guest_daemon = func (){{
+    guest_daemon = func (){|
 const net = require("net");
 const server = new net.Socket();
 const port = process.argv[2];
@@ -73,10 +73,10 @@ server.on("data", (data) => {
         server.write(crashMessage);
     }
 });
-}};
-}}
+|};
+|}
 
-lang Python {{
+lang Python {|
     executable_path = '/usr/bin/python';
     file_extension = 'py';
 
@@ -106,7 +106,7 @@ lang Python {{
     function_wrap_right = '';
     export_string = '';
 
-    guest_daemon = func (){{
+    guest_daemon = func (){|
 import importlib.util
 import json
 import socket
@@ -193,10 +193,10 @@ def _decode(message: bytes):
 
 run_client()
 
-}};
-}}
+|};
+|}
 
-lang Lua {{
+lang Lua {|
     executable_path = '/usr/bin/lua';
     file_extension = 'lua';
 
@@ -226,7 +226,7 @@ lang Lua {{
     function_wrap_right = '\tcoroutine.yield(0)\nend\nreturn reserved_name';
     export_string = '';
 
-    guest_daemon = func (){{
+    guest_daemon = func (){|
 local json = require("rxi-json-lua")
 local socket = require("socket")
 tcp = assert(socket.tcp())
@@ -271,5 +271,5 @@ while true do
     end
 end
 tcp:close()
-}};
-}}
+|};
+|}
