@@ -1,11 +1,11 @@
 getConfig();
 pull JavaScript from '/home/isaiah/general/dits/langs/commonLangs.dit';
 class Number {|
-    func -make-(Str num) {|
+    func Make(Str num) {|
         this.value = num;
     |}
 
-    func -run-() {|
+    func Run() {|
         this.validate();
     |}
 

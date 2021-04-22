@@ -1,5 +1,5 @@
 lang JavaScript {|
-    -priority- = '1';
+    Priority = '1';
     executable_path = '/usr/bin/node';
     file_extension = 'js';
 
