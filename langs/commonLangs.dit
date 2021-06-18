@@ -19,6 +19,9 @@ lang JavaScript {|
     obj_delimiter = ',';
     obj_close = '}';
 
+    add_line_enders = "true";
+    line_ender = ";";
+
     triangle_expr_left = '(yield "';
     triangle_expr_right = '")';
 
@@ -95,6 +98,8 @@ lang Python {|
     obj_colon = ':';
     obj_delimiter = ',';
     obj_close = '}';
+
+    add_line_enders = "false";
 
     triangle_expr_left = 'exe_ditlang("';
     triangle_expr_right = '")';
@@ -215,6 +220,8 @@ lang Lua {|
     obj_colon = ':';
     obj_delimiter = ',';
     obj_close = '}';
+
+    add_line_enders = "false";
 
     triangle_expr_left = 'coroutine.yield("';
     triangle_expr_right = '")';
