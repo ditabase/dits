@@ -38,7 +38,7 @@ lang JavaScript {|
 
     executable_path = '/usr/bin/node';
     file_extension = 'js';
-    add_line_enders = "true"; // add line enders after an outer triagnle expression.
+    add_line_enders = "false"; // This feature was naive, doesn't work generically
     line_ender = ";";
 
     /* 
