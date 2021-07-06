@@ -5,17 +5,17 @@ getConfig();
 pull JavaScript, Lua, Python from '/home/isaiah/general/dits/langs/commonLangs.dit';
 
 sig JavaScript Num func add(Num n1, Num n2) {|
-    <|return (|<|n1;|> + <|n2;|>|);|>;
+    <|return (|<|n1|> + <|n2|>|)|>
 |}
 
 sig Python listOf Num func addNums(listOf Num num_pairs) {|
     # we are given this: [[4,5], [2,6], [2,1]]
     # we should return this: [9, 8, 3]
-    nums = <|num_pairs;|>
+    nums = <|num_pairs|>
     result = []
     for pair in nums:
-        result.append(<|add((|pair[0]|), (|pair[1]|));|>)
-    <|return (|result|);|>
+        result.append(<|add((|pair[0]|), (|pair[1]|))|>)
+    <|return (|result|)|>
 |}
 
 sig Lua listOf Num func run() {|
@@ -29,11 +29,11 @@ sig Lua listOf Num func run() {|
     end
     
     final = json.encode(nums)
-    <|listOf Num sums = addNums((|final|));|>
+    <|listOf Num sums = addNums((|final|))|>
     -- we generated [[4,5], [2,6], [2,1]]
     print("Numbers we generated in Lua: ")
     print(final)
-    <|return sums;|> -- python and JS added: [9, 8, 3]
+    <|return sums|> -- python and JS added: [9, 8, 3]
 |}
 
 listOf Num finalNums = run();

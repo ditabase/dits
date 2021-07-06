@@ -1,37 +1,88 @@
-lang JavaScript {|
+// This file stores all of the currently implemented languages,
+// and also serves as a tutorial for how to implement other languages.
+
+// A lang works a bit like a class, but cannot be instantiated.
+// Instead, it just stores properties. Should support inheritance eventually.
+lang SomeLang {|
+    someProp = 'someValue';
+|}
+//print(SomeLang.someProp);
+
+// The same lang can be 'declared' multiple times to add more properties.
+lang SomeLang {|
+    // Priority is a built in variable that determines property precedence.
+    // Think of it like !important; in CSS.
     Priority = '1';
+    giraffe = 'cool';
+|}
+
+lang SomeLang {|
+    // This declaration has a higher priority, so it overrides the giraffe property.
+    Priority = '10';
+    giraffe = 'not cool';
+|}
+
+lang JavaScript {|
+    // Since this is the main implementation of JavaScript, it's left at priority 1
+    // so that config files can override all it's properties.
+    Priority = '1';
+
+    /* executable_path is the main thing that will be overridden.
+       overrides are based on .ditconf files. You can see an example at
+       https://github.com/ditabase/dit-cli/blob/master/tests/.ditconf
+    
+       dit will always load every .ditconf file from the current working directory
+       down to root. Every lang declaration will be loaded and merged.
+       They are read as normal dit files, so they can run code if you want.
+    */
+
     executable_path = '/usr/bin/node';
     file_extension = 'js';
-
-    null_type = 'null';
-    str_open = '"';
-    str_close = '"';
-    str_escape = '\\';
-    str_newline = '\\n';
-    str_tab = '\\t';
-
-    list_open = '[';
-    list_delimiter = ',';
-    list_close = ']';
-
-    obj_open = '{';
-    obj_colon = ':';
-    obj_delimiter = ',';
-    obj_close = '}';
-
-    add_line_enders = "true";
+    add_line_enders = "true"; // add line enders after an outer triagnle expression.
     line_ender = ";";
+
+    /* 
+        This will replace a '<|' or '|>' with this JavaScript source code.
+        The JS daemon uses generator functions. Each yield call sends a string of
+        dit code back to dit. The dit is executed and the result is returned.
+    */
 
     triangle_expr_left = '(yield "';
     triangle_expr_right = '")';
 
+    /*
+        Once again, this code will replace a '(|' or '|)'
+        It will always be inside an existing yield call from a triangle expression.
+    */
     circle_expr_left = '" + String(';
     circle_expr_right = ') + "';
 
+    // These simply appear at the beginning and end of a function...
     function_wrap_left = 'function* reserved_name() {';
     function_wrap_right = '\tyield 0;\n}';
+    // and at the end of a file.
     export_string = 'module.exports = { reserved_name };';
 
+    /* 
+    Consider the following complete dit function:
+
+    sig JavaScript Str func modifySKU(Str baseSKU){|
+        <|return '(|<|baseSKU|>.substring(5) + '_FINAL'|)'|>
+    |}
+
+    This would result in the following JS code, placed in a file called
+    'Javascript_func_modifySku.js'
+
+    function* reserved_name() {
+        (yield "return '" + String((yield "baseSKU!").substring(5) + '_FINAL') + "'!");
+        yield 0;
+    }
+
+    module.exports = { reserved_name };
+    */
+
+    // Here is the actual socket server that DitLang/Python will communicate with.
+    // Remember that this is actually NodeJS.
     guest_daemon = func (){|
 const net = require("net");
 const server = new net.Socket();
@@ -48,13 +99,17 @@ server.on("data", (data) => {
         let ditlang_callback = null;
         let exe_ditlang = null;
         if (jsonData["type"] == "call_func") {
+            // importing the actual function from file
             var script = require(jsonData["func_path"]);
             FUNC_ITER = script.reserved_name();
         } else if (jsonData["type"] == "ditlang_callback") {
             ditlang_callback = jsonData["result"];
         }
+        // .next either starts the generator function,
+        // or resumes from the previous yield point.
         exe_ditlang = FUNC_ITER.next(ditlang_callback);
 
+        // 0 is used as a control value, only returned when the function is over.
         if (exe_ditlang.value == 0) {
             let finishMessage = JSON.stringify({
                 type: "finish_func",
@@ -80,24 +135,13 @@ server.on("data", (data) => {
 |}
 
 lang Python {|
+    /*
+        DitLang is implemented in Python currently, but it might not be in the future.
+        This is mostly for consistency and testing.
+        Note that it uses threads instead of generator functions and yield.
+    */
     executable_path = '/usr/bin/python';
     file_extension = 'py';
-
-    null_type = 'None';
-    str_open = '"';
-    str_close = '"';
-    str_escape = '\\';
-    str_newline = '\\n';
-    str_tab = '\\t';
-
-    list_open = '[';
-    list_delimiter = ',';
-    list_close = ']';
-
-    obj_open = '{';
-    obj_colon = ':';
-    obj_delimiter = ',';
-    obj_close = '}';
 
     add_line_enders = "false";
 
@@ -204,22 +248,6 @@ run_client()
 lang Lua {|
     executable_path = '/usr/bin/lua';
     file_extension = 'lua';
-
-    null_type = 'nil';
-    str_open = '"';
-    str_close = '"';
-    str_escape = '\\';
-    str_newline = '\\n';
-    str_tab = '\\t';
-
-    list_open = '{';
-    list_delimiter = ',';
-    list_close = '}';
-
-    obj_open = '{';
-    obj_colon = ':';
-    obj_delimiter = ',';
-    obj_close = '}';
 
     add_line_enders = "false";
 
