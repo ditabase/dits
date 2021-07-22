@@ -1,0 +1,16 @@
+sig JavaScript Bool func StringCompare(Str a, Str b) {|
+    // Source: https://stackoverflow.com/a/2140723/8412474
+    let a = <|a|>
+    let b = <|b|>
+    result = typeof a === 'string' && typeof b === 'string'
+        ? a.localeCompare(b, undefined, { sensitivity: 'accent' }) === 0
+        : a === b;
+    <|return (|result|)|>
+|}
+
+/* optional test cases
+print("'a' = 'a'?"); print(StringCompare('a', 'a'));
+print("'AaA' = 'aAa'?"); print(StringCompare('AaA', 'aAa'));
+print("'a' = 'á'?"); print(StringCompare('a', 'á'));
+print("'a' = 'b'?"); print(StringCompare('a', 'b'));
+*/
