@@ -1,8 +1,12 @@
-// This file stores all of the currently implemented languages,
-// and also serves as a tutorial for how to implement other languages.
+/*
+    This file stores all of the currently implemented languages,
+    and also serves as a tutorial for how to implement other languages.
 
-// A lang works a bit like a class, but cannot be instantiated.
-// Instead, it just stores properties. Should support inheritance eventually.
+    A lang works a bit like a class, but cannot be instantiated.
+    Instead, it just stores properties. Should support inheritance eventually.
+    Inheritance will allow a single `Python` lang to support `Python2` 
+    and `Python3`, and then `Python3.8` etc.
+*/ 
 lang SomeLang {|
     someProp = 'someValue';
 |}
@@ -11,7 +15,8 @@ lang SomeLang {|
 // The same lang can be 'declared' multiple times to add more properties.
 lang SomeLang {|
     // Priority is a built in variable that determines property precedence.
-    // Think of it like !important; in CSS.
+    // Think of it like !important; or z-index in CSS.
+    // For now it must be an integer in a string.
     Priority = '1';
     giraffe = 'cool';
 |}
@@ -140,8 +145,15 @@ lang Python {|
     /*
         DitLang is implemented in Python currently, but it might not be in the future.
         This is mostly for consistency and testing.
-        Note that it uses threads instead of generator functions and yield.
+        I also want to add explicit 'integrated' guestlangs, meaning Python
+        could be executed with `eval` or similar.
+
+        Also note that lang names are considered not global to their namespace,
+        but entirely universal. Every lang called `Python` in any file is considered
+        the same. The only difference is the priority. This will change somewhat when
+        langs support inheritance in the future.
     */
+    Priority = '1';
     executable_path = '/usr/bin/python';
     file_extension = 'py';
 
@@ -233,6 +245,7 @@ run_client()
 |}
 
 lang Lua {|
+    Priority = '1';
     executable_path = '/usr/bin/lua';
     file_extension = 'lua';
 
