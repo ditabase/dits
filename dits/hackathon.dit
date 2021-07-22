@@ -1,8 +1,8 @@
 // Gets local machine config
 getConfig();
 
-// Get languages, can also import from raw.githubusercontent.com
-pull JavaScript, Lua, Python from '/home/isaiah/general/dits/langs/commonLangs.dit';
+// Get languages, can also import from local
+pull JavaScript, Lua, Python from 'https://raw.githubusercontent.com/ditabase/dits/master/langs/commonLangs.dit';
 
 sig JavaScript Num func add(Num n1, Num n2) {|
     <|return (|<|n1|> + <|n2|>|)|>
