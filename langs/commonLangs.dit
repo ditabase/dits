@@ -93,51 +93,63 @@ const net = require("net");
 const SOCKET = new net.Socket();
 const port = process.argv[2];
 SOCKET.connect(port, "127.0.0.1", () => {
-    SOCKET.write(JSON.stringify({ type: "connect", lang: "JavaScript" }));
+  SOCKET.write(JSON.stringify({ type: "connect", lang: "JavaScript" }));
 });
 
-let GENERATOR = null;
+let GENERATOR_STACK = [];
 
 SOCKET.on("data", (data) => {
-    try {
-        let jsonData = JSON.parse(data);
-        let genParam = null;
-        let genResult = null;
-        if (jsonData["type"] == "call_func") {
-            // importing the actual function from file
-            var script = require(jsonData["func_path"]);
-            GENERATOR = script.reserved_name();
-        } else if (jsonData["type"] == "ditlang_callback") {
-            // we executed some ditLang code, and genParam is now the result
-            genParam = jsonData["result"];
-        }
-        // .next either starts the generator function,
-        // or resumes from the previous yield point.
-        // genParam will be used as the value of the yield expression.
-        genResult = GENERATOR.next(genParam);
-
-        if (genResult.done) {
-            let finishMessage = JSON.stringify({
-                type: "finish_func",
-                result: null,
-            });
-            SOCKET.write(finishMessage);
-        } else {
-            // genResult.value is ditLang code we need to execute
-            let exeMessage = JSON.stringify({
-                type: "exe_ditlang",
-                result: genResult.value,
-            });
-            SOCKET.write(exeMessage);
-        }
-    } catch (err) {
-        crashMessage = JSON.stringify({
-            type: "crash",
-            result: err.stack,
-        });
-        SOCKET.write(crashMessage);
+  try {
+    let jsonData = JSON.parse(data);
+    let genParam = null;
+    let genResult = null;
+    if (jsonData["type"] == "call_func") {
+      // importing the actual function from file
+      var script = require(jsonData["func_path"]);
+      gen = script.reserved_name();
+      GENERATOR_STACK.push(gen);
+    } else if (jsonData["type"] == "ditlang_callback") {
+      // we executed some ditLang code, and genParam is now the result
+      genParam = jsonData["result"];
+      gen = GENERATOR_STACK[GENERATOR_STACK.length - 1];
+    } else if (jsonData["type"] == "return_keyword") {
+      return finish();
+    } else {
+      throw new Error("Unknown message type");
     }
+    // .next either starts the generator function,
+    // or resumes from the previous yield point.
+    // genParam will be used as the value of the yield expression.
+    genResult = gen.next(genParam);
+
+    if (genResult.done) {
+      finish();
+    } else {
+      // genResult.value is ditLang code we need to execute
+      let exeMessage = JSON.stringify({
+        type: "exe_ditlang",
+        result: genResult.value,
+      });
+      SOCKET.write(exeMessage);
+    }
+  } catch (err) {
+    crashMessage = JSON.stringify({
+      type: "crash",
+      result: err.stack,
+    });
+    SOCKET.write(crashMessage);
+  }
 });
+
+function finish() {
+  GENERATOR_STACK.pop();
+  let finishMessage = JSON.stringify({
+    type: "finish_func",
+    result: null,
+  });
+  SOCKET.write(finishMessage);
+}
+
 |};
 |}
 
@@ -176,10 +188,9 @@ import socket
 import sys
 import time
 import traceback
-from typing import Any, Generator
 
 SERVER: socket.socket = None  # type: ignore
-GENERATOR: Generator[str, Any, None] = None  # type: ignore
+GENERATOR_STACK = []
 
 
 def run_client():
@@ -201,27 +212,40 @@ def run_client():
 
 
 def _daemon_loop() -> None:
-    global SERVER, GENERATOR
+    global SERVER, GENERATOR_STACK
     raw = SERVER.recv(1024)
     if raw:
         json_data = _decode(raw)
         gen_param = None
         if json_data["type"] == "call_func":
             script = _get_script(json_data["func_path"])
-            GENERATOR = script.reserved_name()  # type: ignore
+            gen = script.reserved_name()  # type: ignore
+            GENERATOR_STACK.append(gen)
         elif json_data["type"] == "ditlang_callback":
             gen_param = json_data["result"]
+            gen = GENERATOR_STACK[-1]
+        elif json_data["type"] == "return_keyword":
+            # The function ended with a return keyword,
+            # this message is just letting us know.
+            return _end()
+        else:
+            raise ValueError("Unknown message type")
 
         try:
-            gen_result = GENERATOR.send(gen_param)
+            gen_result = gen.send(gen_param)
             exe_message = _encode({"type": "exe_ditlang", "result": gen_result})
             SERVER.sendall(exe_message)
         except StopIteration:
-            finish_message = _encode({"type": "finish_func", "result": None})
-            SERVER.sendall(finish_message)
+            _end()
     else:
         SERVER.sendall(_encode({"type": "heart"}))
     time.sleep(0.001)  # Prevent pinning the CPU
+
+
+def _end() -> None:
+    GENERATOR_STACK.pop()
+    finish_message = _encode({"type": "finish_func", "result": None})
+    SERVER.sendall(finish_message)
 
 
 def _get_script(path: str):
@@ -241,6 +265,7 @@ def _decode(message: bytes):
 
 
 run_client()
+
 |};
 |}
 
@@ -271,26 +296,38 @@ SOCKET:connect(host, port);
 local connectMes = json.encode({type = "connect", lang = "Lua"})
 SOCKET:send(connectMes)
 
-GENERATOR = nil
+GENERATOR_STACK = {}
+
+local function finish()
+    table.remove(GENERATOR_STACK)
+    local finish_message = json.encode({type = "finish_func", result = nil})
+    SOCKET:send(finish_message)
+end
 
 local function daemon_loop()
     local s, status, partial = SOCKET:receive()
     if status ~= "closed" then
         local jsonData = json.decode(s)
         local genParam = nil
+        local gen = nil
         if jsonData['type'] == "call_func" then
             genParam = require(string.sub(jsonData["func_path"], 10, -5))
-            GENERATOR = coroutine.create(function (func_to_call)
+            gen = coroutine.create(function (func_to_call)
                     func_to_call()
                 end)
+            table.insert(GENERATOR_STACK, gen)
         elseif jsonData['type'] == "ditlang_callback" then
             genParam = jsonData["result"]
+            gen = GENERATOR_STACK[#GENERATOR_STACK]
+        elseif jsonData['type'] == "return_keyword" then
+            return finish()
+        else
+            error("Unknown message type")
         end
 
-        local no_errors, genResult = coroutine.resume(GENERATOR, genParam)
+        local no_errors, genResult = coroutine.resume(gen, genParam)
         if genResult == 0 then
-            local finish_message = json.encode({type = "finish_func", result = nil})
-            SOCKET:send(finish_message)
+            finish()
         else
             local exeMessage = json.encode({type = "exe_ditlang", result = genResult})
             SOCKET:send(exeMessage)
@@ -299,7 +336,7 @@ local function daemon_loop()
 end
 
 while true do
-    local status, err = pcall(daemon_loop) 
+    local status, err = pcall(daemon_loop)
     if status == false then
         local crashMessage = json.encode({type = "crash", result = err})
         SOCKET:send(crashMessage)

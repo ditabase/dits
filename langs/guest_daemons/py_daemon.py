@@ -4,10 +4,9 @@ import socket
 import sys
 import time
 import traceback
-from typing import Any, Generator
 
 SERVER: socket.socket = None  # type: ignore
-GENERATOR: Generator[str, Any, None] = None  # type: ignore
+GENERATOR_STACK = []
 
 
 def run_client():
@@ -29,27 +28,40 @@ def run_client():
 
 
 def _daemon_loop() -> None:
-    global SERVER, GENERATOR
+    global SERVER, GENERATOR_STACK
     raw = SERVER.recv(1024)
     if raw:
         json_data = _decode(raw)
         gen_param = None
         if json_data["type"] == "call_func":
             script = _get_script(json_data["func_path"])
-            GENERATOR = script.reserved_name()  # type: ignore
+            gen = script.reserved_name()  # type: ignore
+            GENERATOR_STACK.append(gen)
         elif json_data["type"] == "ditlang_callback":
             gen_param = json_data["result"]
+            gen = GENERATOR_STACK[-1]
+        elif json_data["type"] == "return_keyword":
+            # The function ended with a return keyword,
+            # this message is just letting us know.
+            return _finish()
+        else:
+            raise ValueError("Unknown message type")
 
         try:
-            gen_result = GENERATOR.send(gen_param)
+            gen_result = gen.send(gen_param)
             exe_message = _encode({"type": "exe_ditlang", "result": gen_result})
             SERVER.sendall(exe_message)
         except StopIteration:
-            finish_message = _encode({"type": "finish_func", "result": None})
-            SERVER.sendall(finish_message)
+            _finish()
     else:
         SERVER.sendall(_encode({"type": "heart"}))
     time.sleep(0.001)  # Prevent pinning the CPU
+
+
+def _finish() -> None:
+    GENERATOR_STACK.pop()
+    finish_message = _encode({"type": "finish_func", "result": None})
+    SERVER.sendall(finish_message)
 
 
 def _get_script(path: str):
