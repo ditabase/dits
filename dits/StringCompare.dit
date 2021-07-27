@@ -1,3 +1,4 @@
+lang JavaScript {||} // Hold over until unassigned langs are added.
 sig JavaScript Bool func StringCompare(Str a, Str b) {|
     // Source: https://stackoverflow.com/a/2140723/8412474
     let a = <|a|>
