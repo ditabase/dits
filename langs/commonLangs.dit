@@ -52,15 +52,15 @@ lang JavaScript {|
         dit code back to dit. The dit is executed and the result is returned.
     */
 
-    triangle_expr_left = '(yield "';
-    triangle_expr_right = '")';
+    triangle_expr_left = '(yield `';
+    triangle_expr_right = '`)';
 
     /*
         Once again, this code will replace a '(|' or '|)'
         It will always be inside an existing yield call from a triangle expression.
     */
-    circle_expr_left = '" + String(';
-    circle_expr_right = ') + "';
+    circle_expr_left = '` + String(';
+    circle_expr_right = ') + `';
 
     // These simply appear at the beginning and end of a function...
     function_wrap_left = 'function* reserved_name() {';
@@ -171,11 +171,11 @@ lang Python {|
 
     add_line_enders = "false";
 
-    triangle_expr_left = '(yield ("';
-    triangle_expr_right = '"))';
+    triangle_expr_left = '(yield ("""';
+    triangle_expr_right = '"""))';
 
-    circle_expr_left = '" + str(';
-    circle_expr_right = ') + "';
+    circle_expr_left = '""" + str(';
+    circle_expr_right = ') + """';
 
     function_wrap_left = 'def reserved_name():';
     function_wrap_right = '';
@@ -276,11 +276,11 @@ lang Lua {|
 
     add_line_enders = "false";
 
-    triangle_expr_left = 'coroutine.yield("';
-    triangle_expr_right = '")';
+    triangle_expr_left = 'coroutine.yield([[';
+    triangle_expr_right = ']])';
 
-    circle_expr_left = '" .. tostring(';
-    circle_expr_right = ') .. "';
+    circle_expr_left = ']] .. tostring(';
+    circle_expr_right = ') .. [[';
 
     function_wrap_left = 'function reserved_name()';
     function_wrap_right = '\tcoroutine.yield(0)\nend\nreturn reserved_name';
